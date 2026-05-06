@@ -1,7 +1,7 @@
 /** @type {number} */
 let warmupFactor = 0.1;
 
-	self.onmessage = function (e) {
+self.onmessage = function (e) {
 	if (e.data.type !== 'run') return;
 
 	const { setupCode, testCases, iterations, minTime } = e.data;
