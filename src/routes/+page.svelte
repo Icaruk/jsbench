@@ -13,18 +13,13 @@
     return n.toFixed(0);
   }
 
-  let hashReady = $state(false);
-
   $effect(() => {
     bench.setupCode;
     bench.testCases;
     bench.iterations;
     bench.minTime;
-    if (!hashReady) {
-      hashReady = true;
-      return;
-    }
-    bench.syncHash();
+    const timer = setTimeout(() => bench.syncHash(), 1500);
+    return () => clearTimeout(timer);
   });
 </script>
 

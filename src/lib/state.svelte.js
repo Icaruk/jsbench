@@ -39,9 +39,7 @@ class AppState {
 			minTime: this.minTime
 		};
 		const compressed = encode(data);
-		const url = new URL(location.href);
-		url.hash = compressed;
-		history.replaceState(null, '', url);
+		location.hash = compressed;
 	}
 
 	getShareableURL() {
