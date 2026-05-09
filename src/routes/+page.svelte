@@ -18,6 +18,7 @@
     bench.testCases;
     bench.iterations;
     bench.minTime;
+    bench.parallel;
     const timer = setTimeout(() => bench.syncHash(), 1500);
     return () => clearTimeout(timer);
   });

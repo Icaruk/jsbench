@@ -5,6 +5,14 @@
 
   let pct = $derived(bench.progressTotal > 0 ? Math.round((bench.progressCurrent / bench.progressTotal) * 100) : 0);
 
+  let estimatedSec = $derived(bench.getEstimatedTime());
+
+  function formatEstimate(sec) {
+    if (sec < 1) return `${(sec * 1000).toFixed(0)}ms`;
+    if (sec < 60) return `${sec.toFixed(1)}s`;
+    return `${(sec / 60).toFixed(1)}min`;
+  }
+
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(bench.getShareableURL());
@@ -27,12 +35,28 @@
     {bench.running ? bench.progress || "Running..." : "▶ Run Benchmark"}
   </button>
 
+  <label class="parallel-toggle" class:active={bench.parallel}>
+    <input
+      type="checkbox"
+      bind:checked={bench.parallel}
+      disabled={bench.running}
+    />
+    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    Parallel
+  </label>
+
+  <span class="time-estimate">~{formatEstimate(estimatedSec)}</span>
+
   <button
     class="copy-btn"
     onclick={handleCopy}
   >
     {copied ? "✓ Copied!" : "📋 Copy URL"}
   </button>
+
+  {#if bench.parallel}
+    <div class="parallel-note">May reduce precision due to CPU contention</div>
+  {/if}
 
   {#if bench.error}
     <div class="error">{bench.error}</div>
@@ -92,6 +116,56 @@
     padding: 6px 12px;
     border-radius: 6px;
     border: 1px solid #4a2a2a;
+  }
+  .parallel-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #888;
+    cursor: pointer;
+    user-select: none;
+  }
+  .parallel-toggle input {
+    display: none;
+  }
+  .toggle-track {
+    display: inline-block;
+    width: 32px;
+    height: 18px;
+    background: #333;
+    border-radius: 9px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .parallel-toggle.active .toggle-track {
+    background: #2a6a9c;
+  }
+  .toggle-thumb {
+    display: block;
+    width: 14px;
+    height: 14px;
+    background: #aaa;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .parallel-toggle.active .toggle-thumb {
+    transform: translateX(14px);
+    background: #8ac4ff;
+  }
+  .time-estimate {
+    font-size: 12px;
+    color: #666;
+    font-family: monospace;
+  }
+  .parallel-note {
+    color: #a8884a;
+    font-size: 11px;
+    font-style: italic;
+    width: 100%;
   }
   .progress-container {
     position: relative;

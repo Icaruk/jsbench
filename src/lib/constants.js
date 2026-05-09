@@ -22,3 +22,5 @@ export const DEFAULT_TEST_CASES = [
 
 export const DEFAULT_ITERATIONS = [10, 100, 500, 2000];
 export const DEFAULT_MIN_TIME = 1000;
+export const DEFAULT_WARMUP = 500;
+export const DEFAULT_PARALLEL = false;

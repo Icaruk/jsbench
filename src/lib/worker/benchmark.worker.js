@@ -1,10 +1,7 @@
-/** @type {number} */
-let warmupFactor = 0.1;
-
 self.onmessage = function (e) {
 	if (e.data.type !== 'run') return;
 
-	const { setupCode, testCases, iterations, minTime } = e.data;
+	const { setupCode, testCases, iterations, minTime, warmup } = e.data;
 	const totalSteps = iterations.length * testCases.length;
 	let currentStep = 0;
 	const allResults = [];
@@ -54,9 +51,13 @@ self.onmessage = function (e) {
 				return;
 			}
 
-			const warmupCount = Math.max(1, Math.floor(n * warmupFactor));
+			let warmupOps = 0;
+			const warmupStart = performance.now();
 			try {
-				for (let i = 0; i < warmupCount; i++) fn(...values);
+				while (performance.now() - warmupStart < warmup) {
+					fn(...values);
+					warmupOps++;
+				}
 			} catch (err) {
 				self.postMessage({
 					type: 'error',
@@ -65,12 +66,21 @@ self.onmessage = function (e) {
 				return;
 			}
 
+			const avgExecTime = (performance.now() - warmupStart) / warmupOps;
+			const checkAfter = Math.max(1, Math.ceil(minTime / avgExecTime / 100));
+
 			let ops = 0;
 			const start = performance.now();
+			let checksLeft = checkAfter;
 			try {
-				while (performance.now() - start < minTime) {
+				while (true) {
 					fn(...values);
 					ops++;
+					checksLeft--;
+					if (!checksLeft) {
+						if (performance.now() - start >= minTime) break;
+						checksLeft = checkAfter;
+					}
 				}
 			} catch (err) {
 				self.postMessage({
