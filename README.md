@@ -2,7 +2,11 @@
 
 Compare JavaScript performance across different approaches and iteration sizes. Runs entirely client-side using Web Workers for accurate results.
 
-**URL** [https://jsbench.icaruk.dev/](https://jsbench.icaruk.dev/)
+[https://jsbench.icaruk.dev/](https://jsbench.icaruk.dev/)
+
+<img width="699" height="476" alt="image" src="https://github.com/user-attachments/assets/6b149042-2d7c-4b17-9405-de9bcf3f038b" />
+<img width="698" height="603" alt="image" src="https://github.com/user-attachments/assets/e7182ac5-3350-4d8a-8c82-89344230cbc9" />
+
 
 ## Features
 
