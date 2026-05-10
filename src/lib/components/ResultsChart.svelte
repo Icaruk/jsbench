@@ -66,14 +66,14 @@
         scales: {
           x: {
             ticks: { color: css("--color-text-muted") },
-            grid: { color: css("--color-surface") },
+            grid: { color: "rgba(255,255,255,0.06)" },
           },
           y: {
             ticks: {
               color: css("--color-text-muted"),
               callback: val => formatOps(val),
             },
-            grid: { color: css("--color-surface") },
+            grid: { color: "rgba(255,255,255,0.06)" },
             title: {
               display: true,
               text: "ops/sec",
@@ -96,12 +96,12 @@
   });
 </script>
 
-<div class="chart-container">
+<div class="section-content">
   <canvas bind:this={canvasEl}></canvas>
 </div>
 
 <style>
-  .chart-container {
+  .section-content {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     padding: var(--space-4);

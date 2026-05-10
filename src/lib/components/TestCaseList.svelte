@@ -34,7 +34,7 @@
 <SectionTitle title="Test Cases" />
 
 <div
-  class="test-list"
+  class="section-content"
   role="list"
 >
   {#each bench.testCases as testcase, index (testcase.id)}
@@ -62,7 +62,7 @@
 </div>
 
 <style>
-  .test-list {
+  .section-content {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);

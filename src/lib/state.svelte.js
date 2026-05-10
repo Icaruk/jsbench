@@ -1,4 +1,4 @@
-import { DEFAULT_SETUP, DEFAULT_TEST_CASES, DEFAULT_ITERATIONS, DEFAULT_MIN_TIME, DEFAULT_WARMUP, DEFAULT_PARALLEL } from './constants.js';
+import { DEFAULT_SETUP, DEFAULT_TEST_CASES, DEFAULT_ITERATIONS, DEFAULT_MIN_TIME, DEFAULT_WARMUP, DEFAULT_PARALLEL, DEFAULT_TITLE } from './constants.js';
 import { encode, decode } from './serializer.js';
 
 function getWorkerCount(testCaseCount) {
@@ -32,6 +32,7 @@ function createInitialState() {
 		iterations: decoded?.iterations ?? [...DEFAULT_ITERATIONS],
 		minTime: decoded?.minTime ?? DEFAULT_MIN_TIME,
 		parallel: decoded?.parallel ?? DEFAULT_PARALLEL,
+		title: decoded?.title ?? DEFAULT_TITLE,
 		results: null,
 		running: false,
 		progress: ''
@@ -46,6 +47,7 @@ class AppState {
 		this.iterations = $state(initial.iterations);
 		this.minTime = $state(initial.minTime);
 		this.parallel = $state(initial.parallel);
+		this.title = $state(initial.title);
 		this.results = $state(initial.results);
 		this.running = $state(initial.running);
 		this.progress = $state(initial.progress);
@@ -60,7 +62,8 @@ class AppState {
 			testCases: this.testCases,
 			iterations: this.iterations,
 			minTime: this.minTime,
-			parallel: this.parallel
+			parallel: this.parallel,
+			title: this.title
 		};
 		const compressed = encode(data);
 		location.hash = compressed;
@@ -72,7 +75,8 @@ class AppState {
 			testCases: this.testCases,
 			iterations: this.iterations,
 			minTime: this.minTime,
-			parallel: this.parallel
+			parallel: this.parallel,
+			title: this.title
 		};
 		const compressed = encode(data);
 		return `${location.origin}${location.pathname}#${compressed}`;

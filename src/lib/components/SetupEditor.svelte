@@ -6,7 +6,7 @@
 
 <SectionTitle title="Setup Code" />
 
-<div class="setup-editor">
+<div class="section-content">
   <div class="header">
     <span class="hint">Use $N for iteration size</span>
   </div>
@@ -14,7 +14,7 @@
 </div>
 
 <style>
-  .setup-editor {
+  .section-content {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     overflow: hidden;

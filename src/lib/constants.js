@@ -1,32 +1,25 @@
-export const DEFAULT_SETUP = `const obj = {};
-
-for (let i = 0; i < 20; i++) {
-  obj[\`key\${i}\`] = i;
-}
-  
-return { obj };`;
+export const DEFAULT_SETUP = `const arr = Array.from({ length: $N }, (_, i) => Math.floor(i / 2));
+return { arr };`;
 
 export const DEFAULT_TEST_CASES = [
 	{
 		id: crypto.randomUUID(),
-		name: 'spread',
-		code: 'const a = { ...obj };'
+		name: 'new Set',
+		code: 'const a = [...new Set(arr)];'
 	},
 	{
 		id: crypto.randomUUID(),
-		name: 'Object.assign',
-		code: 'const b = Object.assign({}, obj);'
+		name: 'filter + indexOf',
+		code: 'const b = arr.filter((v, i) => arr.indexOf(v) === i);'
 	},
 	{
 		id: crypto.randomUUID(),
-		name: 'for...in',
-		code: `const c = {};
-for (const key in obj) {
-  c[key] = obj[key];
-}`
+		name: 'reduce + includes',
+		code: 'const c = arr.reduce((a, v) => a.includes(v) ? a : [...a, v], []);'
 	}
 ];
 
+export const DEFAULT_TITLE = "Remove duplicates from array — Set vs filter vs reduce";
 export const DEFAULT_ITERATIONS = [20, 100, 500, 3_000, 20_000];
 export const DEFAULT_MIN_TIME = 1000;
 export const DEFAULT_WARMUP = 500;

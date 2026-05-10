@@ -38,13 +38,14 @@
     bench.iterations;
     bench.minTime;
     bench.parallel;
+    bench.title;
     const timer = setTimeout(() => bench.syncHash(), 1500);
     return () => clearTimeout(timer);
   });
 </script>
 
 <svelte:head>
-  <title>JSBench — JavaScript Benchmarking Tool</title>
+  <title>{bench.title ? `${bench.title} — JSBench` : 'JSBench — JavaScript Benchmarking Tool'}</title>
   <meta
     name="description"
     content="Compare JavaScript performance across different approaches and iteration sizes. Client-side benchmarking with shareable results."

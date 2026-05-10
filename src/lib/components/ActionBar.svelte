@@ -7,7 +7,7 @@
 
 <SectionTitle title="Actions" />
 
-<div class="action-bar">
+<div class="section-content">
   <div class="bar-row">
     <button
       class="mode-btn"
@@ -43,7 +43,7 @@
 {/if}
 
 <style>
-  .action-bar {
+  .section-content {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);

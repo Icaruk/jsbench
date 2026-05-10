@@ -6,7 +6,8 @@ export function encode(state) {
 		t: state.testCases.map((tc) => ({ i: tc.id, n: tc.name, c: tc.code })),
 		n: state.iterations,
 		m: state.minTime,
-		p: state.parallel ? 1 : 0
+		p: state.parallel ? 1 : 0,
+		l: state.title || undefined
 	};
 	const json = JSON.stringify(serializable);
 	return LZString.compressToEncodedURIComponent(json);
@@ -23,7 +24,8 @@ export function decode(hash) {
 			testCases: data.t?.map((tc) => ({ id: tc.i, name: tc.n, code: tc.c })) ?? undefined,
 			iterations: data.n ?? undefined,
 			minTime: data.m ?? undefined,
-			parallel: data.p === 1 ? true : data.p === 0 ? false : undefined
+			parallel: data.p === 1 ? true : data.p === 0 ? false : undefined,
+			title: data.l ?? undefined
 		};
 	} catch {
 		return null;
