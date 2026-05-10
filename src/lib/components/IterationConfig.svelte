@@ -1,34 +1,59 @@
 <script>
   import { state as bench } from "$lib/state.svelte.js";
+  import SectionTitle from "./SectionTitle.svelte";
+
+  const MIN_TIME = 100;
+  const MAX_TIME = 30_000;
 
   let iterationsStr = $state(bench.iterations.join(", "));
   let minTimeStr = $state(String(bench.minTime));
 
-  function handleIterationsBlur() {
-    const parsed = iterationsStr
+  function parseIterations(str) {
+    return str
       .split(",")
       .map(s => parseInt(s.trim().replace(/_/g, ""), 10))
       .filter(n => !isNaN(n) && n > 0);
+  }
+
+  function formatWithUnderscores(n) {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "_");
+  }
+
+  function formatIterations(arr) {
+    return arr.map(n => formatWithUnderscores(n)).join(", ");
+  }
+
+  function handleIterationsBlur() {
+    const parsed = parseIterations(iterationsStr);
     if (parsed.length > 0) {
       bench.iterations = parsed;
     }
+    iterationsStr = formatIterations(bench.iterations);
+  }
+
+  function clampMinTime(raw) {
+    const parsed = parseInt(raw, 10);
+    if (isNaN(parsed)) return null;
+    return Math.max(MIN_TIME, Math.min(parsed, MAX_TIME));
   }
 
   function handleMinTimeBlur() {
-    let parsed = parseInt(minTimeStr, 10);
-
-    if (!isNaN(parsed) && parsed > 0) {
-      parsed = Math.min(parsed, 10_000);
-
-      bench.minTime = parsed;
-      minTimeStr = String(parsed);
+    const clamped = clampMinTime(minTimeStr);
+    if (clamped === null) {
+      minTimeStr = String(bench.minTime);
+      return;
     }
+    bench.minTime = clamped;
+    minTimeStr = String(clamped);
   }
 </script>
 
+<SectionTitle title="Configuration" />
+
 <div class="config">
   <label class="field">
-    <span>Iteration sizes ($N)</span>
+    <span class="label-text">Iteration sizes ($N)</span>
+    <span class="label-hint">Values in milliseconds can be separated by comma</span>
     <input
       type="text"
       bind:value={iterationsStr}
@@ -37,7 +62,8 @@
     />
   </label>
   <label class="field">
-    <span>Min time (ms)</span>
+    <span class="label-text">Min run time (ms)</span>
+    <span class="label-hint">Minimum time each test case will run per iteration</span>
     <input
       type="text"
       bind:value={minTimeStr}
@@ -47,32 +73,54 @@
   </label>
 </div>
 
+<p class="info-text">Each size replaces <code>$N</code> in your setup code and runs all test cases independently. Compare how approaches scale with different input sizes.</p>
+
 <style>
   .config {
     display: flex;
-    gap: 16px;
+    gap: var(--space-4);
     flex-wrap: wrap;
   }
   .field {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    font-size: 12px;
-    color: #aaa;
+    gap: var(--space-1);
     flex: 1;
     min-width: 180px;
   }
+  .label-text {
+    font-size: var(--font-sm);
+    color: var(--color-text);
+  }
+  .label-hint {
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
   .field input {
-    background: #1e1e1e;
-    border: 1px solid #333;
-    color: #e0e0e0;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-family: monospace;
-    font-size: 13px;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: var(--font-md);
     outline: none;
     &:focus {
-      border-color: #555;
+      border-color: var(--color-text-dim);
     }
+  }
+  .info-text {
+    margin: var(--space-2) 0 0;
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    line-height: var(--lh-md);
+  }
+  .info-text code {
+    color: var(--color-accent);
+    background: var(--color-surface);
+    padding: 1px var(--space-1);
+    border-radius: var(--radius-sm);
   }
 </style>

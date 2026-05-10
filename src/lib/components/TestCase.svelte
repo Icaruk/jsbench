@@ -32,8 +32,8 @@
 
 <style>
 	.test-case {
-		border: 1px solid #333;
-		border-radius: 8px;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
 		overflow: hidden;
 		transition: opacity 0.2s;
 	}
@@ -43,35 +43,36 @@
 	.test-header {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		padding: 6px 12px;
-		background: #1e1e1e;
-		border-bottom: 1px solid #333;
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-3);
+		background: var(--color-surface-raised);
+		border-bottom: 1px solid var(--color-border);
 	}
 	.drag-handle {
 		cursor: grab;
-		color: #666;
-		font-size: 16px;
+		color: var(--color-text-dim);
+		font-size: var(--font-lg);
 		user-select: none;
+		&:hover { color: var(--color-text); }
 		&:active { cursor: grabbing; }
 	}
 	.test-name {
 		flex: 1;
 		background: transparent;
 		border: none;
-		color: #e0e0e0;
-		font-size: 13px;
+		color: var(--color-text);
+		font-size: var(--font-md);
 		outline: none;
 		font-family: inherit;
 	}
 	.delete-btn {
 		background: transparent;
 		border: none;
-		color: #666;
+		color: var(--color-text-dim);
 		cursor: pointer;
-		font-size: 14px;
-		padding: 2px 6px;
-		border-radius: 4px;
-		&:hover { background: #3a1a1a; color: #ff6666; }
+		font-size: var(--font-sm);
+		padding: var(--space-1) var(--space-2);
+		border-radius: var(--radius-sm);
+		&:hover { background: var(--color-error-bg); color: var(--color-error); }
 	}
 </style>

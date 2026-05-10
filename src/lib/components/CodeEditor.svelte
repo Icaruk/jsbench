@@ -46,11 +46,11 @@
 
 <style>
 	.cm-wrapper {
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		overflow: hidden;
 	}
 	.cm-wrapper :global(.cm-editor) {
-		font-size: 13px;
+		font-size: var(--font-md);
 		height: auto;
 	}
 	.cm-wrapper :global(.cm-scroller) {
