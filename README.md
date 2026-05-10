@@ -18,4 +18,3 @@ All running client-side with Web Workers for accurate, noise-free results.
 - Web Worker execution with warmup phase, parallel and serial modes
 - Drag-and-drop test case reordering
 - Configurable minimum run time per test
-- 

@@ -20,6 +20,9 @@
 	--color-surface: #1a1a1a;
 	--color-surface-raised: #1e1e1e;
 
+	/* Gradient */
+	--gradient-bg: linear-gradient(90deg, #0d0d0d 0%, #141414 35%, #181818 55%, #0d0d0d 100%);
+
 	/* Colors - Border */
 	--color-border: #333;
 	--color-border-subtle: #222;
@@ -89,11 +92,13 @@
 }
 
 body {
-	background: var(--color-bg);
+	background: var(--gradient-bg);
+	background-attachment: fixed;
 	color: var(--color-text);
 	font-family: var(--font-sans);
 	margin: 0;
 	padding: 0;
+	min-height: 100vh;
 }
 
 *,
