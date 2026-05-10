@@ -16,7 +16,13 @@ export default defineConfig({
 	projects: [
 		{
 			name: 'chromium',
-			use: { browserName: 'chromium' }
+			use: { browserName: 'chromium' },
+			testIgnore: ['**/screenshots.spec.js']
+		},
+		{
+			name: 'screenshots',
+			use: { browserName: 'chromium' },
+			testMatch: ['**/screenshots.spec.js']
 		}
 	]
 });

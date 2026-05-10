@@ -1,12 +1,12 @@
 # JSBench — JavaScript Benchmarking Tool
 
-Compare JavaScript performance at scale. Pit methods head-to-head across different input sizes and see which pattern wins — all running client-side with Web Workers for accurate, noise-free results.
+Compare JavaScript performance at scale.  
+Pit methods head-to-head across different input sizes and see which pattern wins. 
+All running client-side with Web Workers for accurate, noise-free results.
 
 [https://jsbench.icaruk.dev/](https://jsbench.icaruk.dev/)
 
-<img width="699" height="476" alt="image" src="https://github.com/user-attachments/assets/6b149042-2d7c-4b17-9405-de9bcf3f038b" />
-<img width="698" height="603" alt="image" src="https://github.com/user-attachments/assets/e7182ac5-3350-4d8a-8c82-89344230cbc9" />
-
+![app view](static/screenshot-app.png)
 
 ## Features
 
@@ -18,3 +18,4 @@ Compare JavaScript performance at scale. Pit methods head-to-head across differe
 - Web Worker execution with warmup phase, parallel and serial modes
 - Drag-and-drop test case reordering
 - Configurable minimum run time per test
+- 
