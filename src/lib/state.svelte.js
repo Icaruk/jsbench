@@ -39,6 +39,45 @@ function createInitialState() {
 	};
 }
 
+function formatPreview(value) {
+	return JSON.stringify(value, null, 2);
+}
+
+function extractCompletions(obj) {
+	if (!obj || typeof obj !== 'object') return [];
+	const completions = [];
+	const METHODS_TO_SKIP = new Set([
+		'constructor', '__proto__', '__defineGetter__', '__defineSetter__',
+		'__lookupGetter__', '__lookupSetter__', 'toLocaleString', 'toString', 'valueOf',
+		'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable'
+	]);
+
+	for (const [key, value] of Object.entries(obj)) {
+		completions.push({ label: key, type: 'variable', detail: typeof value });
+
+		if (value !== null && typeof value === 'object') {
+			const proto = Object.getPrototypeOf(value);
+			if (proto) {
+				const methods = Object.getOwnPropertyNames(proto)
+					.filter(m => !METHODS_TO_SKIP.has(m) && typeof proto[m] === 'function');
+				for (const method of methods) {
+					completions.push({ label: `${key}.${method}`, type: 'method' });
+				}
+			}
+			if (Array.isArray(value)) {
+				completions.push({ label: `${key}.length`, type: 'property', detail: 'number' });
+			} else {
+				for (const subKey of Object.keys(value)) {
+					completions.push({ label: `${key}.${subKey}`, type: 'property' });
+				}
+			}
+		} else if (typeof value === 'string') {
+			completions.push({ label: `${key}.length`, type: 'property', detail: 'number' });
+		}
+	}
+	return completions;
+}
+
 class AppState {
 	constructor() {
 		const initial = createInitialState();
@@ -54,6 +93,10 @@ class AppState {
 		this.progressCurrent = $state(0);
 		this.progressTotal = $state(0);
 		this.error = $state(/** @type {string | null} */ (null));
+		this.previewResult = $state(/** @type {string | null} */ (null));
+		this.previewError = $state(/** @type {string | null} */ (null));
+		this.previewRunning = $state(false);
+		this.completions = $state([]);
 	}
 
 	syncHash() {
@@ -113,6 +156,51 @@ class AppState {
 			return this._runParallel();
 		}
 		return this._runSequential();
+	}
+
+	async runPreview() {
+		if (this.previewRunning) return;
+		this.previewRunning = true;
+		this.previewError = null;
+		this.previewResult = null;
+
+		const worker = this._createWorker({
+			type: 'preview',
+			setupCode: this.setupCode
+		});
+
+		const timeout = setTimeout(() => {
+			worker.terminate();
+			this.previewError = 'Preview timeout (2s)';
+			this.previewRunning = false;
+		}, 2000);
+
+		return new Promise((resolve) => {
+			worker.onmessage = (e) => {
+				if (e.data.type === 'preview-result') {
+					clearTimeout(timeout);
+					this.previewResult = formatPreview(e.data.data);
+					this.completions = extractCompletions(e.data.data);
+					this.previewRunning = false;
+					worker.terminate();
+					resolve();
+				} else if (e.data.type === 'preview-error') {
+					clearTimeout(timeout);
+					this.previewError = e.data.message;
+					this.previewRunning = false;
+					worker.terminate();
+					resolve();
+				}
+			};
+
+			worker.onerror = (e) => {
+				clearTimeout(timeout);
+				this.previewError = e.message;
+				this.previewRunning = false;
+				worker.terminate();
+				resolve();
+			};
+		});
 	}
 
 	_createWorker(payload) {

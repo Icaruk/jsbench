@@ -1,4 +1,4 @@
-export const DEFAULT_SETUP = `const arr = Array.from({ length: $N }, (_, i) => Math.floor(i / 2));
+export const DEFAULT_SETUP = `const arr = Array.from({ length: $N }, (_, i) => i);
 return { arr };`;
 
 export const DEFAULT_TEST_CASES = [

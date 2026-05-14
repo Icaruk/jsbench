@@ -1,8 +1,7 @@
 # JSBench — JavaScript Benchmarking Tool
 
-Compare JavaScript performance at scale.  
-Pit methods head-to-head across different input sizes and see which pattern wins. 
-All running client-side with Web Workers for accurate, noise-free results.
+JSBench is a high-performance JavaScript benchmarking tool designed to compare multiple code patterns across varying input sizes.
+It executes user-provided code in a clean, isolated environment to provide accurate performance metrics without UI thread interference.
 
 [https://jsbench.icaruk.dev/](https://jsbench.icaruk.dev/)
 

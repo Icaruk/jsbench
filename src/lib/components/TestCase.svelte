@@ -1,5 +1,6 @@
 <script>
 	import CodeEditor from './CodeEditor.svelte';
+	import { state as bench } from '$lib/state.svelte.js';
 
 	let { testcase, ondelete, class: className = '' } = $props();
 </script>
@@ -27,7 +28,7 @@
 		/>
 		<button class="delete-btn" onclick={ondelete} title="Delete test">✕</button>
 	</div>
-	<CodeEditor bind:code={testcase.code} />
+	<CodeEditor bind:code={testcase.code} completions={bench.completions} />
 </div>
 
 <style>

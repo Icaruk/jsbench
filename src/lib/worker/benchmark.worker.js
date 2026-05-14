@@ -1,5 +1,18 @@
 self.onmessage = function (e) {
-	if (e.data.type !== 'run') return;
+	const type = e.data.type;
+	if (type === 'preview') {
+		const { setupCode } = e.data;
+		const resolvedSetup = setupCode.replace(/\$N/g, '1');
+		try {
+			const result = new Function(resolvedSetup)();
+			self.postMessage({ type: 'preview-result', data: result });
+		} catch (err) {
+			self.postMessage({ type: 'preview-error', message: err.message });
+		}
+		return;
+	}
+
+	if (type !== 'run') return;
 
 	const { setupCode, testCases, iterations, minTime, warmup } = e.data;
 	const totalSteps = iterations.length * testCases.length;

@@ -119,7 +119,7 @@
 <div class="app">
   <header class="header">
     <div class="header-top">
-        <a href="/" class="logo-link" onclick={() => location.reload()}>
+        <a href="/" class="logo-link" onclick={() => { location.hash = ''; location.reload(); }}>
           <img
             src={logoIcon}
             alt=""
