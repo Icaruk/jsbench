@@ -170,7 +170,7 @@ test('parallel toggle enables parallel mode and completes benchmark', async ({ p
 	await page.waitForSelector('button.run-btn');
 	await page.waitForTimeout(500);
 
-	const toggle = page.locator('.parallel-toggle');
+	const toggle = page.locator('.mode-btn');
 	await toggle.click();
 	await expect(toggle).toHaveClass(/active/);
 

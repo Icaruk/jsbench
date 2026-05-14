@@ -15,5 +15,7 @@ test('screenshot: app', async ({ page }) => {
 	await page.click('button.run-btn');
 	await page.waitForSelector('.group-table', { timeout: 120000 });
 	await page.waitForTimeout(500);
+	await page.click('button.preview-btn');
+	await page.waitForTimeout(500);
 	await page.screenshot({ path: SCREENSHOT_RESULTS, fullPage: true });
 });
