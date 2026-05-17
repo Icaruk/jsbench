@@ -13,8 +13,7 @@
 	let editorEl;
 	/** @type {EditorView | undefined} */
 	let view;
-	/** @type {Completion[]} */
-	let currentCompletions = completions;
+	let currentCompletions = $derived(completions);
 
 	/** @param {import('@codemirror/autocomplete').CompletionContext} context */
 	function completionSource(context) {
@@ -49,11 +48,6 @@
 		});
 
 		return () => view?.destroy();
-	});
-
-	$effect(() => {
-		completions;
-		currentCompletions = completions;
 	});
 
 	$effect(() => {
