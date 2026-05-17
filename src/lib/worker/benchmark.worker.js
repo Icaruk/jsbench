@@ -1,3 +1,6 @@
+/** @import { WorkerPayload, IterationGroup, TestCase } from '../constants.js' */
+
+/** @param {{ data: WorkerPayload }} e */
 self.onmessage = function (e) {
 	const type = e.data.type;
 	if (type === 'preview') {
@@ -6,7 +9,7 @@ self.onmessage = function (e) {
 		try {
 			const result = new Function(resolvedSetup)();
 			self.postMessage({ type: 'preview-result', data: result });
-		} catch (err) {
+		} catch (/** @type {any} */ err) {
 			self.postMessage({ type: 'preview-error', message: err.message });
 		}
 		return;
@@ -17,6 +20,7 @@ self.onmessage = function (e) {
 	const { setupCode, testCases, iterations, minTime, warmup } = e.data;
 	const totalSteps = iterations.length * testCases.length;
 	let currentStep = 0;
+	/** @type {IterationGroup[]} */
 	const allResults = [];
 
 	for (const n of iterations) {
@@ -24,7 +28,7 @@ self.onmessage = function (e) {
 		let context;
 		try {
 			context = new Function(resolvedSetup)();
-		} catch (err) {
+		} catch (/** @type {any} */ err) {
 			self.postMessage({
 				type: 'error',
 				message: `Setup error (N=${n}): ${err.message}`
@@ -42,9 +46,11 @@ self.onmessage = function (e) {
 
 		const keys = Object.keys(context);
 		const values = Object.values(context);
+		/** @type {import('../constants.js').IterationResult[]} */
 		const iterationResults = [];
 
 		for (let ti = 0; ti < testCases.length; ti++) {
+			/** @type {TestCase} */
 			const tc = testCases[ti];
 			self.postMessage({
 				type: 'progress',
@@ -56,7 +62,7 @@ self.onmessage = function (e) {
 			let fn;
 			try {
 				fn = new Function(...keys, tc.code);
-			} catch (err) {
+			} catch (/** @type {any} */ err) {
 				self.postMessage({
 					type: 'error',
 					message: `Compile error in "${tc.name}": ${err.message}`
@@ -71,7 +77,7 @@ self.onmessage = function (e) {
 					fn(...values);
 					warmupOps++;
 				}
-			} catch (err) {
+			} catch (/** @type {any} */ err) {
 				self.postMessage({
 					type: 'error',
 					message: `Runtime error in "${tc.name}" (warmup): ${err.message}`
@@ -95,7 +101,7 @@ self.onmessage = function (e) {
 						checksLeft = checkAfter;
 					}
 				}
-			} catch (err) {
+			} catch (/** @type {any} */ err) {
 				self.postMessage({
 					type: 'error',
 					message: `Runtime error in "${tc.name}": ${err.message}`

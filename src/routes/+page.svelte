@@ -18,12 +18,14 @@
     } catch { /* noop */ }
   }
 
+  /** @param {number} n @returns {string} */
   function formatOps(n) {
     if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + "M";
     if (n >= 1_000) return (n / 1_000).toFixed(2) + "K";
     return n.toFixed(0);
   }
 
+  /** @param {number} sec @returns {string} */
   function formatEstimate(sec) {
     if (sec < 1) return `${(sec * 1000).toFixed(0)}ms`;
     if (sec < 60) return `${sec.toFixed(1)}s`;
@@ -102,8 +104,7 @@
     name="twitter:image"
     content="https://jsbench.icaruk.dev/og-image.png"
   />
-  {@html '<script type="application/ld+json">' +
-    JSON.stringify({
+  {@html `<script type="application/ld+json">${JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebApplication",
       name: "JSBench",
@@ -112,8 +113,7 @@
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Any",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    }) +
-    "</script>"}
+    })}</script>`}
 </svelte:head>
 
 <div class="app">
@@ -128,7 +128,7 @@
           <h1>JSBench</h1>
         </a>
       <button
-        class="copy-btn"
+        class="btn--warn"
         onclick={handleCopy}
       >
         {copied ? "✓ Copied!" : "📋 Share"}
@@ -152,7 +152,7 @@
   
   <section class="section">
     <ActionBar />
-    <p class="time-estimate">Estimated time: ~{formatEstimate(estimatedSec)}</p>
+    <p class="text-muted-mono time-estimate">Estimated time: ~{formatEstimate(estimatedSec)}</p>
   </section>
 
   {#if bench.results}
@@ -164,7 +164,7 @@
       {#each bench.results as group}
         {@const sorted = [...group.results].sort((a, b) => b.opsPerSec - a.opsPerSec)}
         {@const fastest = sorted[0]}
-        <div class="group">
+        <div class="card group">
           <div class="group-header">N = {group.iterationSize.toLocaleString()}</div>
           <table class="group-table">
             <tbody>
@@ -230,19 +230,6 @@
     color: var(--color-text-muted);
     font-size: var(--font-sm);
   }
-  .copy-btn {
-    background: var(--color-warn-bg);
-    border: 1px solid var(--color-warn-border);
-    color: var(--color-warn);
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-size: var(--font-xs);
-    font-family: var(--font-mono);
-    &:hover {
-      background: var(--color-warn-hover);
-    }
-  }
   .section {
     display: flex;
     flex-direction: column;
@@ -250,9 +237,6 @@
   }
   .time-estimate {
     margin: var(--space-2) 0;
-    font-size: var(--font-xs);
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
     text-align: center;
   }
   .results-wrap {
@@ -261,9 +245,6 @@
     gap: var(--space-4);
   }
   .group {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
     min-width: 320px;
     flex: 1 1 calc(50% - var(--space-4) / 2);
     max-width: calc(50% - var(--space-4) / 2);

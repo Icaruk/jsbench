@@ -1,17 +1,19 @@
 import { test, expect } from '@playwright/test';
 import LZString from 'lz-string';
 
+/** @param {{ setupCode: string; testCases: { id: string; name: string; code: string; }[]; iterations: number[]; minTime: number; parallel?: boolean; }} opts @returns {string} */
 function buildHash({ setupCode, testCases, iterations, minTime, parallel }) {
 	const data = {
 		s: setupCode,
-		t: testCases.map((tc) => ({ i: tc.id, n: tc.name, c: tc.code })),
+		t: testCases.map((/** @type {{ id: string; name: string; code: string; }} */ tc) => ({ i: tc.id, n: tc.name, c: tc.code })),
 		n: iterations,
 		m: minTime,
-		p: parallel ? 1 : 0
+		p: (parallel ?? false) ? 1 : 0
 	};
 	return LZString.compressToEncodedURIComponent(JSON.stringify(data));
 }
 
+/** @param {Parameters<typeof buildHash>[0]} opts @returns {string} */
 function buildURL(opts) {
 	return `http://localhost:5173/#${buildHash(opts)}`;
 }
@@ -47,7 +49,7 @@ test('warmup + minTime timing accuracy', async ({ page }) => {
 	expect(elapsed).toBeLessThanOrEqual(3000);
 
 	const opsText = await page.locator('.ops').first().textContent();
-	const ops = parseFloat(opsText.replace(/[KM]/g, ''));
+	const ops = parseFloat(String(opsText).replace(/[KM]/g, ''));
 	expect(ops).toBeGreaterThan(0);
 });
 
@@ -107,7 +109,7 @@ test('ops/sec decreases with larger iteration sizes', async ({ page }) => {
 	const opsElements = page.locator('.ops');
 	const opsValues = [];
 	for (const el of await opsElements.all()) {
-		const text = await el.textContent();
+		const text = String(await el.textContent());
 		let val = parseFloat(text);
 		if (text.includes('K')) val *= 1000;
 		if (text.includes('M')) val *= 1000000;

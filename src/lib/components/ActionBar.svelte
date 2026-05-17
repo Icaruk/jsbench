@@ -10,7 +10,7 @@
 <div class="section-content">
   <div class="bar-row">
     <button
-      class="mode-btn"
+      class="btn--serial"
       class:active={bench.parallel}
       onclick={() => (bench.parallel = !bench.parallel)}
       disabled={bench.running}
@@ -19,7 +19,7 @@
     </button>
 
     <button
-      class="run-btn"
+      class="btn--accent run-btn"
       onclick={() => bench.runBenchmark()}
       disabled={bench.running || bench.testCases.length === 0}
     >
@@ -28,7 +28,7 @@
   </div>
 
   {#if bench.error}
-    <div class="error">{bench.error}</div>
+    <div class="error-block error-block--bordered">{bench.error}</div>
   {/if}
 </div>
 
@@ -52,61 +52,9 @@
     display: flex;
     gap: var(--space-2);
   }
-  .mode-btn {
-    background: var(--color-serial-bg);
-    border: 1px solid var(--color-serial-border);
-    color: var(--color-serial);
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-size: var(--font-sm);
-    font-family: var(--font-mono);
-    white-space: nowrap;
-    transition:
-      background 0.2s,
-      border-color 0.2s,
-      color 0.2s;
-    &:hover:not(:disabled) {
-      border-color: var(--color-serial);
-    }
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    &.active {
-      background: var(--color-parallel-bg);
-      border-color: var(--color-parallel-border);
-      color: var(--color-parallel);
-      &:hover:not(:disabled) {
-        border-color: var(--color-parallel);
-      }
-    }
-  }
   .run-btn {
     flex: 1;
-    background: var(--color-accent-bg);
-    border: 1px solid var(--color-accent-border);
-    color: var(--color-accent);
     padding: var(--space-2) var(--space-4);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-size: var(--font-sm);
-    font-weight: 600;
-    &:hover:not(:disabled) {
-      background: var(--color-accent-hover);
-    }
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-  .error {
-    color: var(--color-error);
-    font-size: var(--font-sm);
-    background: var(--color-error-bg);
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-error-border);
   }
   .progress-container {
     position: relative;

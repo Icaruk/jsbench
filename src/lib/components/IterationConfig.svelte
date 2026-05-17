@@ -8,17 +8,20 @@
   let iterationsStr = $state(bench.iterations.join(", "));
   let minTimeStr = $state(String(bench.minTime));
 
+  /** @param {string} str @returns {number[]} */
   function parseIterations(str) {
     return str
       .split(",")
-      .map(s => parseInt(s.trim().replace(/_/g, ""), 10))
-      .filter(n => !isNaN(n) && n > 0);
+      .map(/** @param {string} s */ s => parseInt(s.trim().replace(/_/g, ""), 10))
+      .filter(/** @param {number} n */ n => !isNaN(n) && n > 0);
   }
 
+  /** @param {number} n @returns {string} */
   function formatWithUnderscores(n) {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "_");
   }
 
+  /** @param {number[]} arr @returns {string} */
   function formatIterations(arr) {
     return arr.map(n => formatWithUnderscores(n)).join(", ");
   }
@@ -31,6 +34,7 @@
     iterationsStr = formatIterations(bench.iterations);
   }
 
+  /** @param {string} raw @returns {number | null} */
   function clampMinTime(raw) {
     const parsed = parseInt(raw, 10);
     if (isNaN(parsed)) return null;
@@ -55,10 +59,11 @@
     <label class="field">
       <div class="label-row">
         <span class="label-text">Title</span>
-        <span class="label-hint">{bench.title.length}/64</span>
+        <span class="text-muted-mono">{bench.title.length}/64</span>
       </div>
       <input
         type="text"
+        class="input"
         maxlength={64}
         bind:value={bench.title}
         placeholder="Remove duplicates from array"
@@ -68,9 +73,10 @@
   <div class="row">
     <label class="field">
       <span class="label-text">Iteration sizes ($N)</span>
-      <span class="label-hint">Values in milliseconds can be separated by comma</span>
+      <span class="text-muted-mono">Values in milliseconds can be separated by comma</span>
       <input
         type="text"
+        class="input"
         bind:value={iterationsStr}
         onblur={handleIterationsBlur}
         placeholder="10, 100, 500, 2_000, 10_000"
@@ -78,9 +84,10 @@
     </label>
     <label class="field">
       <span class="label-text">Min run time (ms)</span>
-      <span class="label-hint">Minimum time each test case will run per iteration</span>
+      <span class="text-muted-mono">Minimum time each test case will run per iteration</span>
       <input
         type="text"
+        class="input"
         bind:value={minTimeStr}
         onblur={handleMinTimeBlur}
         placeholder="1000"
@@ -117,24 +124,6 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-  }
-  .label-hint {
-    font-size: var(--font-xs);
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-  }
-  .field input {
-    background: var(--color-surface-raised);
-    border: 1px solid var(--color-border);
-    color: var(--color-text);
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
-    font-family: var(--font-mono);
-    font-size: var(--font-md);
-    outline: none;
-    &:focus {
-      border-color: var(--color-text-dim);
-    }
   }
   .info-text {
     margin: var(--space-2) 0 0;

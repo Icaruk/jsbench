@@ -1,13 +1,18 @@
 <script>
+  /** @import { IterationGroup } from '../constants.js' */
   import { Chart, registerables } from "chart.js";
   import { onMount, onDestroy } from "svelte";
 
   Chart.register(...registerables);
 
+  /** @type {{ results?: IterationGroup[] }} */
   let { results = [] } = $props();
+  /** @type {HTMLCanvasElement} */
   let canvasEl;
+  /** @type {Chart | undefined} */
   let chart;
 
+  /** @param {string} name @returns {string} */
   function css(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
@@ -17,6 +22,7 @@
     renderChart(results);
   });
 
+  /** @param {IterationGroup[]} data */
   function renderChart(data) {
     if (chart) chart.destroy();
 
@@ -56,9 +62,9 @@
           },
           tooltip: {
             callbacks: {
-              label: ctx => {
-                const val = ctx.parsed.y;
-                return `${ctx.dataset.label}: ${formatOps(val)} ops/sec`;
+              label: (ctx) => {
+                const val = ctx.parsed.y ?? 0;
+                return `${ctx.dataset.label ?? ''}: ${formatOps(val)} ops/sec`;
               },
             },
           },
@@ -71,7 +77,8 @@
           y: {
             ticks: {
               color: css("--color-text-muted"),
-              callback: val => formatOps(val),
+              /** @param {string | number} val */
+              callback: val => formatOps(Number(val)),
             },
             grid: { color: "rgba(255,255,255,0.06)" },
             title: {
@@ -85,6 +92,7 @@
     });
   }
 
+  /** @param {number} n @returns {string} */
   function formatOps(n) {
     if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
     if (n >= 1_000) return (n / 1_000).toFixed(1) + "K";
@@ -96,21 +104,13 @@
   });
 </script>
 
-<div class="section-content">
+<div class="card chart-card">
   <canvas bind:this={canvasEl}></canvas>
 </div>
 
 <style>
-  .section-content {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+  .chart-card {
     padding: var(--space-4);
     background: var(--color-surface);
-  }
-  h3 {
-    margin: 0;
-    font-size: var(--font-lg);
-    font-weight: 600;
-    color: var(--color-accent);
   }
 </style>

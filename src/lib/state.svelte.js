@@ -1,17 +1,22 @@
+/** @import { TestCase, Completion, WorkerMessage, IterationGroup } from './constants.js' */
 import { DEFAULT_SETUP, DEFAULT_TEST_CASES, DEFAULT_ITERATIONS, DEFAULT_MIN_TIME, DEFAULT_WARMUP, DEFAULT_PARALLEL, DEFAULT_TITLE } from './constants.js';
 import { encode, decode } from './serializer.js';
 
+/** @param {number} testCaseCount */
 function getWorkerCount(testCaseCount) {
 	const cores = navigator.hardwareConcurrency || 4;
 	return Math.min(testCaseCount, cores);
 }
 
+/** @param {TestCase[]} testCases @param {number} numWorkers @returns {TestCase[][]} */
 function distributeTestCases(testCases, numWorkers) {
+	/** @type {TestCase[][]} */
 	const chunks = Array.from({ length: numWorkers }, () => []);
 	testCases.forEach((tc, i) => chunks[i % numWorkers].push(tc));
 	return chunks;
 }
 
+/** @param {{ iterations: number[]; testCases: TestCase[]; minTime: number; warmup: number; parallel: boolean; }} opts @returns {number} */
 function estimateTimeSec({ iterations, testCases, minTime, warmup, parallel }) {
 	const totalPerBench = (warmup + minTime) / 1000;
 	if (!parallel) {
@@ -28,23 +33,26 @@ function createInitialState() {
 
 	return {
 		setupCode: decoded?.setupCode ?? DEFAULT_SETUP,
-		testCases: decoded?.testCases ?? structuredClone(DEFAULT_TEST_CASES),
+		testCases: /** @type {TestCase[]} */ (decoded?.testCases ?? structuredClone(DEFAULT_TEST_CASES)),
 		iterations: decoded?.iterations ?? [...DEFAULT_ITERATIONS],
 		minTime: decoded?.minTime ?? DEFAULT_MIN_TIME,
 		parallel: decoded?.parallel ?? DEFAULT_PARALLEL,
 		title: decoded?.title ?? DEFAULT_TITLE,
-		results: null,
+		results: /** @type {IterationGroup[] | null} */ (null),
 		running: false,
 		progress: ''
 	};
 }
 
+/** @param {any} value @returns {string} */
 function formatPreview(value) {
 	return JSON.stringify(value, null, 2);
 }
 
+/** @param {Record<string, any>} obj @returns {Completion[]} */
 function extractCompletions(obj) {
 	if (!obj || typeof obj !== 'object') return [];
+	/** @type {Completion[]} */
 	const completions = [];
 	const METHODS_TO_SKIP = new Set([
 		'constructor', '__proto__', '__defineGetter__', '__defineSetter__',
@@ -82,20 +90,27 @@ class AppState {
 	constructor() {
 		const initial = createInitialState();
 		this.setupCode = $state(initial.setupCode);
+		/** @type {TestCase[]} */
 		this.testCases = $state(initial.testCases);
+		/** @type {number[]} */
 		this.iterations = $state(initial.iterations);
 		this.minTime = $state(initial.minTime);
 		this.parallel = $state(initial.parallel);
 		this.title = $state(initial.title);
+		/** @type {IterationGroup[] | null} */
 		this.results = $state(initial.results);
 		this.running = $state(initial.running);
 		this.progress = $state(initial.progress);
 		this.progressCurrent = $state(0);
 		this.progressTotal = $state(0);
-		this.error = $state(/** @type {string | null} */ (null));
-		this.previewResult = $state(/** @type {string | null} */ (null));
-		this.previewError = $state(/** @type {string | null} */ (null));
+		/** @type {string | null} */
+		this.error = $state(null);
+		/** @type {string | null} */
+		this.previewResult = $state(null);
+		/** @type {string | null} */
+		this.previewError = $state(null);
 		this.previewRunning = $state(false);
+		/** @type {Completion[]} */
 		this.completions = $state([]);
 	}
 
@@ -133,10 +148,12 @@ class AppState {
 		});
 	}
 
+	/** @param {string} id */
 	removeTestCase(id) {
 		this.testCases = this.testCases.filter((tc) => tc.id !== id);
 	}
 
+	/** @param {number} fromIndex @param {number} toIndex */
 	moveTestCase(fromIndex, toIndex) {
 		if (fromIndex === toIndex) return;
 		const item = this.testCases.splice(fromIndex, 1)[0];
@@ -175,7 +192,9 @@ class AppState {
 			this.previewRunning = false;
 		}, 2000);
 
-		return new Promise((resolve) => {
+		/** @type {Promise<void>} */
+		const promise = new Promise((resolve) => {
+			/** @param {MessageEvent<WorkerMessage>} e */
 			worker.onmessage = (e) => {
 				if (e.data.type === 'preview-result') {
 					clearTimeout(timeout);
@@ -183,13 +202,13 @@ class AppState {
 					this.completions = extractCompletions(e.data.data);
 					this.previewRunning = false;
 					worker.terminate();
-					resolve();
+					resolve(undefined);
 				} else if (e.data.type === 'preview-error') {
 					clearTimeout(timeout);
 					this.previewError = e.data.message;
 					this.previewRunning = false;
 					worker.terminate();
-					resolve();
+					resolve(undefined);
 				}
 			};
 
@@ -198,11 +217,13 @@ class AppState {
 				this.previewError = e.message;
 				this.previewRunning = false;
 				worker.terminate();
-				resolve();
+				resolve(undefined);
 			};
 		});
+		return promise;
 	}
 
+	/** @param {import('./constants.js').WorkerPayload} payload */
 	_createWorker(payload) {
 		const worker = new Worker(
 			new URL('./worker/benchmark.worker.js', import.meta.url),
@@ -222,7 +243,9 @@ class AppState {
 			warmup: DEFAULT_WARMUP
 		});
 
+		/** @type {Promise<void>} */
 		return new Promise((resolve) => {
+			/** @param {MessageEvent<WorkerMessage>} e */
 			worker.onmessage = (e) => {
 				if (e.data.type === 'progress') {
 					this.progress = e.data.message;
@@ -232,12 +255,12 @@ class AppState {
 					this.results = e.data.data;
 					this._finishRun();
 					worker.terminate();
-					resolve();
+					resolve(undefined);
 				} else if (e.data.type === 'error') {
 					this.error = e.data.message;
 					this._finishRun();
 					worker.terminate();
-					resolve();
+					resolve(undefined);
 				}
 			};
 
@@ -245,7 +268,7 @@ class AppState {
 				this.error = e.message;
 				this._finishRun();
 				worker.terminate();
-				resolve();
+				resolve(undefined);
 			};
 		});
 	}
@@ -256,10 +279,13 @@ class AppState {
 		const totalSteps = this.iterations.length * this.testCases.length;
 		let completedSteps = 0;
 		let pending = chunks.length;
+		/** @type {IterationGroup[]} */
 		const allResults = [];
 		const iterationOrder = this.iterations;
+		/** @type {string | null} */
 		let firstError = null;
 
+		/** @type {Promise<void>} */
 		return new Promise((resolve) => {
 			for (let wi = 0; wi < chunks.length; wi++) {
 				const chunk = chunks[wi];
@@ -268,7 +294,7 @@ class AppState {
 					if (pending === 0) {
 						this._mergeParallelResults(allResults, iterationOrder);
 						this._finishRun();
-						resolve();
+						resolve(undefined);
 					}
 					continue;
 				}
@@ -282,7 +308,7 @@ class AppState {
 					warmup: DEFAULT_WARMUP
 				});
 
-				worker.onmessage = (e) => {
+				worker.onmessage = /** @param {MessageEvent<WorkerMessage>} e */ (e) => {
 					if (e.data.type === 'progress') {
 						completedSteps++;
 						const pct = Math.round((completedSteps / totalSteps) * 100);
@@ -300,7 +326,7 @@ class AppState {
 								this._mergeParallelResults(allResults, iterationOrder);
 							}
 							this._finishRun();
-							resolve();
+							resolve(undefined);
 						}
 					} else if (e.data.type === 'error') {
 						if (!firstError) firstError = e.data.message;
@@ -309,7 +335,7 @@ class AppState {
 						if (pending === 0) {
 							this.error = firstError;
 							this._finishRun();
-							resolve();
+							resolve(undefined);
 						}
 					}
 				};
@@ -321,20 +347,22 @@ class AppState {
 					if (pending === 0) {
 						this.error = firstError;
 						this._finishRun();
-						resolve();
+						resolve(undefined);
 					}
 				};
 			}
 		});
 	}
 
+	/** @param {IterationGroup[]} rawResults @param {number[]} iterationOrder */
 	_mergeParallelResults(rawResults, iterationOrder) {
+		/** @type {Map<number, import('./constants.js').IterationResult[]>} */
 		const grouped = new Map();
 		for (const group of rawResults) {
 			if (!grouped.has(group.iterationSize)) {
 				grouped.set(group.iterationSize, []);
 			}
-			grouped.get(group.iterationSize).push(...group.results);
+			grouped.get(group.iterationSize)?.push(...group.results);
 		}
 
 		this.results = iterationOrder.map((n) => ({

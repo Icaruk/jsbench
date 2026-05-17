@@ -1,16 +1,22 @@
 <script>
+	/** @import { Completion } from '../constants.js' */
 	import { EditorView, basicSetup } from 'codemirror';
 	import { javascript } from '@codemirror/lang-javascript';
 	import { oneDark } from '@codemirror/theme-one-dark';
 	import { autocompletion } from '@codemirror/autocomplete';
 	import { onMount } from 'svelte';
 
+	/** @type {{ code?: string; onchange?: (val: string) => void; placeholder?: string; readonly?: boolean; completions?: Completion[] }} */
 	let { code = $bindable(''), onchange, placeholder = '', readonly = false, completions = [] } = $props();
 
+	/** @type {HTMLElement} */
 	let editorEl;
+	/** @type {EditorView | undefined} */
 	let view;
+	/** @type {Completion[]} */
 	let currentCompletions = completions;
 
+	/** @param {import('@codemirror/autocomplete').CompletionContext} context */
 	function completionSource(context) {
 		const word = context.matchBefore(/[\w.]+/);
 		if (!word) return null;

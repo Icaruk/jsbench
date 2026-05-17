@@ -3,29 +3,34 @@
   import SectionTitle from "./SectionTitle.svelte";
   import { state as bench } from "$lib/state.svelte.js";
 
+  /** @type {string | null} */
   let dropTargetId = $state(null);
 
+  /** @param {DragEvent} e @param {number} index */
   function handleDragOver(e, index) {
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
   }
 
+  /** @param {DragEvent} e @param {number} targetIndex */
   function handleDrop(e, targetIndex) {
     e.preventDefault();
     dropTargetId = null;
-    const draggedId = e.dataTransfer.getData("text/plain");
+    const draggedId = e.dataTransfer?.getData("text/plain");
     if (!draggedId) return;
-    const fromIndex = bench.testCases.findIndex(tc => tc.id === draggedId);
+    const fromIndex = bench.testCases.findIndex(/** @param {import('$lib/constants.js').TestCase} tc */ tc => tc.id === draggedId);
     if (fromIndex === -1 || fromIndex === targetIndex) return;
     bench.moveTestCase(fromIndex, targetIndex);
   }
 
+  /** @param {string} id */
   function handleDragEnter(id) {
     dropTargetId = id;
   }
 
+  /** @param {DragEvent} e @param {string} id */
   function handleDragLeave(e, id) {
-    if (!e.currentTarget.contains(e.relatedTarget)) {
+    if (!(/** @type {Element} */ (e.currentTarget)).contains(/** @type {Node} */ (e.relatedTarget))) {
       if (dropTargetId === id) dropTargetId = null;
     }
   }
@@ -54,7 +59,7 @@
     </div>
   {/each}
   <button
-    class="add-btn"
+    class="btn--success-ghost"
     onclick={() => bench.addTestCase()}
   >
     + Add Test Case
@@ -72,18 +77,5 @@
   }
   .test-wrapper.drop-active {
     transform: translateY(var(--space-1));
-  }
-  .add-btn {
-    background: rgba(106, 154, 106, 0.1);
-    border: 1px dashed rgba(106, 154, 106, 0.3);
-    color: var(--color-success);
-    padding: var(--space-2);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-size: var(--font-md);
-    &:hover {
-      background: rgba(106, 154, 106, 0.18);
-      border-color: rgba(106, 154, 106, 0.5);
-    }
   }
 </style>
