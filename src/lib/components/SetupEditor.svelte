@@ -25,6 +25,7 @@
     <span class="text-muted-mono">Preview always uses N=1</span>
     <button
       class="btn--accent"
+      data-testid="preview-btn"
       onclick={handlePreview}
       disabled={bench.previewRunning}
     >

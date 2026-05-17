@@ -37,18 +37,18 @@ test('warmup + minTime timing accuracy', async ({ page }) => {
 	});
 
 	await page.goto(url);
-	await page.waitForSelector('button.run-btn');
+	await page.waitForSelector('[data-testid="run-btn"]');
 	await page.waitForTimeout(500);
 
 	const start = Date.now();
-	await page.click('button.run-btn');
-	await page.waitForSelector('.group-table', { timeout: 60000 });
+	await page.click('[data-testid="run-btn"]');
+	await page.waitForSelector('[data-testid="results-table"]', { timeout: 60000 });
 	const elapsed = Date.now() - start;
 
 	expect(elapsed).toBeGreaterThanOrEqual(800);
 	expect(elapsed).toBeLessThanOrEqual(3000);
 
-	const opsText = await page.locator('.ops').first().textContent();
+	const opsText = await page.locator('[data-testid="ops-cell"]').first().textContent();
 	const ops = parseFloat(String(opsText).replace(/[KM]/g, ''));
 	expect(ops).toBeGreaterThan(0);
 });
@@ -65,22 +65,22 @@ test('multiple iteration sizes produce separate result groups', async ({ page })
 	});
 
 	await page.goto(url);
-	await page.waitForSelector('button.run-btn');
+	await page.waitForSelector('[data-testid="run-btn"]');
 	await page.waitForTimeout(500);
 
-	await page.click('button.run-btn');
-	await page.waitForSelector('.group-table', { timeout: 120000 });
+	await page.click('[data-testid="run-btn"]');
+	await page.waitForSelector('[data-testid="results-table"]', { timeout: 120000 });
 
-	const groups = page.locator('.group');
+	const groups = page.locator('[data-testid="result-group"]');
 	await expect(groups).toHaveCount(3);
 
-	const headers = page.locator('.group-header');
+	const headers = page.locator('[data-testid="group-header"]');
 	await expect(headers.nth(0)).toContainText('10');
 	await expect(headers.nth(1)).toContainText('100');
 	await expect(headers.nth(2)).toContainText('500');
 
 	for (let i = 0; i < 3; i++) {
-		const rows = groups.nth(i).locator('.ops');
+		const rows = groups.nth(i).locator('[data-testid="ops-cell"]');
 		await expect(rows).toHaveCount(2);
 		for (const row of await rows.all()) {
 			const text = await row.textContent();
@@ -100,13 +100,13 @@ test('ops/sec decreases with larger iteration sizes', async ({ page }) => {
 	});
 
 	await page.goto(url);
-	await page.waitForSelector('button.run-btn');
+	await page.waitForSelector('[data-testid="run-btn"]');
 	await page.waitForTimeout(500);
 
-	await page.click('button.run-btn');
-	await page.waitForSelector('.group-table', { timeout: 120000 });
+	await page.click('[data-testid="run-btn"]');
+	await page.waitForSelector('[data-testid="results-table"]', { timeout: 120000 });
 
-	const opsElements = page.locator('.ops');
+	const opsElements = page.locator('[data-testid="ops-cell"]');
 	const opsValues = [];
 	for (const el of await opsElements.all()) {
 		const text = String(await el.textContent());
@@ -130,12 +130,12 @@ test('setup error shows error message', async ({ page }) => {
 	});
 
 	await page.goto(url);
-	await page.waitForSelector('button.run-btn');
+	await page.waitForSelector('[data-testid="run-btn"]');
 	await page.waitForTimeout(500);
 
-	await page.click('button.run-btn');
-	await expect(page.locator('.error')).toBeVisible({ timeout: 30000 });
-	await expect(page.locator('.error')).toContainText('Setup error');
+	await page.click('[data-testid="run-btn"]');
+	await expect(page.locator('[data-testid="error-message"]')).toBeVisible({ timeout: 30000 });
+	await expect(page.locator('[data-testid="error-message"]')).toContainText('Setup error');
 });
 
 test('runtime error in test case shows error message', async ({ page }) => {
@@ -149,12 +149,12 @@ test('runtime error in test case shows error message', async ({ page }) => {
 	});
 
 	await page.goto(url);
-	await page.waitForSelector('button.run-btn');
+	await page.waitForSelector('[data-testid="run-btn"]');
 	await page.waitForTimeout(500);
 
-	await page.click('button.run-btn');
-	await expect(page.locator('.error')).toBeVisible({ timeout: 30000 });
-	await expect(page.locator('.error')).toContainText('Runtime error');
+	await page.click('[data-testid="run-btn"]');
+	await expect(page.locator('[data-testid="error-message"]')).toBeVisible({ timeout: 30000 });
+	await expect(page.locator('[data-testid="error-message"]')).toContainText('Runtime error');
 });
 
 test('parallel toggle enables parallel mode and completes benchmark', async ({ page }) => {
@@ -169,25 +169,25 @@ test('parallel toggle enables parallel mode and completes benchmark', async ({ p
 	});
 
 	await page.goto(url);
-	await page.waitForSelector('button.run-btn');
+	await page.waitForSelector('[data-testid="run-btn"]');
 	await page.waitForTimeout(500);
 
-	const toggle = page.locator('.mode-btn');
+	const toggle = page.locator('[data-testid="mode-toggle"]');
 	await toggle.click();
 	await expect(toggle).toHaveClass(/active/);
 
 	const start = Date.now();
-	await page.click('button.run-btn');
-	await page.waitForSelector('.group-table', { timeout: 120000 });
+	await page.click('[data-testid="run-btn"]');
+	await page.waitForSelector('[data-testid="results-table"]', { timeout: 120000 });
 	const elapsed = Date.now() - start;
 
 	expect(elapsed).toBeGreaterThanOrEqual(500);
 
-	const groups = page.locator('.group');
+	const groups = page.locator('[data-testid="result-group"]');
 	await expect(groups).toHaveCount(2);
 
 	for (let i = 0; i < 2; i++) {
-		const rows = groups.nth(i).locator('.ops');
+		const rows = groups.nth(i).locator('[data-testid="ops-cell"]');
 		await expect(rows).toHaveCount(2);
 		for (const row of await rows.all()) {
 			const text = await row.textContent();

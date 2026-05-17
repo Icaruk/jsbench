@@ -10,12 +10,12 @@ const SCREENSHOT_RESULTS = resolve(STATIC_DIR, 'screenshot-app.png');
 test('screenshot: app', async ({ page }) => {
 	await page.setViewportSize({ width: 920, height: 600 });
 	await page.goto('http://localhost:5173/');
-	await page.waitForSelector('.run-btn');
+	await page.waitForSelector('[data-testid="run-btn"]');
 	await page.waitForTimeout(500);
-	await page.click('button.run-btn');
-	await page.waitForSelector('.group-table', { timeout: 120000 });
+	await page.click('[data-testid="run-btn"]');
+	await page.waitForSelector('[data-testid="results-table"]', { timeout: 120000 });
 	await page.waitForTimeout(500);
-	await page.click('button.preview-btn');
+	await page.click('[data-testid="preview-btn"]');
 	await page.waitForTimeout(500);
 	await page.screenshot({ path: SCREENSHOT_RESULTS, fullPage: true });
 });

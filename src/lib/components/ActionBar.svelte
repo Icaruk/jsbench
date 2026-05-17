@@ -12,6 +12,7 @@
     <button
       class="btn--serial"
       class:active={bench.parallel}
+      data-testid="mode-toggle"
       onclick={() => (bench.parallel = !bench.parallel)}
       disabled={bench.running}
     >
@@ -20,6 +21,7 @@
 
     <button
       class="btn--accent run-btn"
+      data-testid="run-btn"
       onclick={() => bench.runBenchmark()}
       disabled={bench.running || bench.testCases.length === 0}
     >
@@ -28,7 +30,7 @@
   </div>
 
   {#if bench.error}
-    <div class="error-block error-block--bordered">{bench.error}</div>
+    <div class="error-block error-block--bordered" data-testid="error-message">{bench.error}</div>
   {/if}
 </div>
 

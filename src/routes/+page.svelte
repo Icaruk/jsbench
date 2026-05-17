@@ -164,15 +164,15 @@
       {#each bench.results as group}
         {@const sorted = [...group.results].sort((a, b) => b.opsPerSec - a.opsPerSec)}
         {@const fastest = sorted[0]}
-        <div class="card group">
-          <div class="group-header">N = {group.iterationSize.toLocaleString()}</div>
-          <table class="group-table">
+        <div class="card group" data-testid="result-group">
+          <div class="group-header" data-testid="group-header">N = {group.iterationSize.toLocaleString()}</div>
+          <table class="group-table" data-testid="results-table">
             <tbody>
               {#each sorted as result, i}
                 <tr class:fastest={i === 0}>
                   <td class="rank">#{i + 1}</td>
                   <td class="name">{result.name}</td>
-                  <td class="ops">{formatOps(result.opsPerSec)}</td>
+                  <td class="ops" data-testid="ops-cell">{formatOps(result.opsPerSec)}</td>
                   <td class="unit">ops/sec</td>
                   {#if i > 0}
                     <td class="slower">{((fastest.opsPerSec / result.opsPerSec - 1) * 100).toFixed(0)}% slower</td>
